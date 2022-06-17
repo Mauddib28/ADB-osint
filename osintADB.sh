@@ -49,6 +49,7 @@ function osint_explore_adb_target {
 	echo -e "================================================================================"
 	echo -e "[*] Collecting information on the ADB Android Target ID\t-\t[\t$adb_target_id\t]"
 	echo -e "--------------------------------------------------------------------------------"
+	echo -e "[*] Gathering Android System Properties Information"
 	# Print out Device Property Information (Formatted Summary type output)
 	echo -e "Device Property Summary Information:"
 	echo -e "\tSDK Build Version:			$(adb -s $adb_target_id shell getprop ro.build.verison.sdk)"
@@ -61,6 +62,10 @@ function osint_explore_adb_target {
 	echo -e "\tOEM Unlock Supported:		$(adb -s $adb_target_id shell getprop ro.oem_unlock_supported)"
 	echo -e "\tBoot Image Build Fingerprint:	$(adb -s $adb_target_id shell getprop ro.bootimage.build.fingerprint)"
 	echo -e "\tBoot WiFi MAC Address:		$(adb -s $adb_target_id shell getprop ro.boot.wifimacaddr)"
+	echo -e "\tDevice net.dns1:"
+	adb -s $adb_target_id shell getprop net.dns1
+	echo -e "\tDevice net.dns2:"
+	echo -e "[*] Gathering Android Settings System Information"
 	# Print out System Settings Information
 	echo -e "\tSystem Settings Information:" 
 	adb -s $adb_target_id shell settings list system
@@ -88,16 +93,39 @@ function osint_explore_adb_target {
 	# Print Current WiFi Status
 	echo -e "\tCurrent Device WiFi Status Information:"
 	adb -s $adb_target_id shell settings get global wifi_on
+	echo -e "--------------------------------------------------------------------------------"
+	echo -e "\tInternal Device Testing"
+	## TODO: Add in commands to attempt screen control, take screenshots, and then exfiltrate
+	# Use screenrecord, screencap, then 'adb pull' the file; default location: /sdcard/<filename>
+	echo -e "[*] Attempting Screen Capture and Recordings of Android Device"
+	echo -e "\tScreen Capture being Attempted...."
+	adb -s $adb_target_id shell screencap /sdcard/screen.png
+	adb -s $adb_target_id shell pull /sdcard/screen.png
+	echo -e "\tAttempting Screen Recording...."
+	adb -s $adb_target_id shell screenrecord /sdcard/demo.mp4
+	adb -s $adb_target_id shell pull /sdcard/demo.mp4
+	adb -s $adb_target_id shell getprop net.dns2
+	echo -e "[*] Gathering Activity Manager (AM) Information"
+	#adb -s $adb_target_id shell am 
+	echo -e "[*] Gathering Package Manager (PM) Information"
+	# Print Packages of the System
+	adb -s $adb_target_id shell pm list packages
 	# Print Features of the System
 	echo -e "\tFeatures of the System Information:"
 	adb -s $adb_target_id shell pm list features
 	# Print System Permissions
 	echo -e "\tList of the Known Permissions:"
 	adb -s $adb_target_id shell pm list permissions
-	echo -e "--------------------------------------------------------------------------------"
-	echo -e "\tInternal Device Testing"
-	## TODO: Add in commands to attempt screen control, take screenshots, and then exfiltrate
-	# Use screenrecord, screencap, then 'adb pull' the file; default location: /sdcard/<filename>
+	# Print System Libraries
+	echo -e "\tList of the Known Libraries:"
+	adb -s $adb_target_id shell pm list libraries
+	# Print System Users
+	echo -e "\tList of the Known Users:"
+	adb -s $adb_target_id shell pm list users
+	# Print Test of All Packages
+	echo -e "\tResults of Testing all Packages"
+	adb -s $adb_target_id shell pm list instrumentation
+	echo -e "[*] Gathering Device Policy Manager (DPM) Informaiton"
 	# End of the Search Output
 	echo -e "================================================================================"
 }
