@@ -1,0 +1,401 @@
+Website for Useful Commands for Android Debug Bridge (ADB)
+	- URL:		https://n00bie.medium.com/hacking-android-using-adb-34079a7488f8
+
+----------------
+	ADB COMMANDS
+----------------
+
+adb kill-server			-	Kill ADB Server
+adb start-server		-	Start ADB Server
+
+adb install C:package.apk 	— 	Installs the package located at C:package.apk on your computer on your device.
+	->	adb install < path_to_apk >
+
+adb uninstall package.name 	— 	Uninstalls the package with package.name from your device. For example, you’d use the name com.rovio.angrybirds to uninstall the Angry Birds app.
+
+adb push C:file /sdcard/file 	— 	Pushes a file from your computer to your device. For example, the command here pushes the file located at C:file on your computer to /sdcard/file on your device
+
+adb pull /sdcard/file C:file 	— 	Pulls a file from your device to your computer — works like adb push, but in reverse.
+
+adb logcat 			— 	View your Android device’s log. Can be useful for debugging apps.
+
+adb shell 			— 	Gives you an interactive Linux command-line shell on your device.
+
+adb shell command 		— 	Runs the specified shell command on your device.
+
+adb forward tcp:6100 tcp:7100	-	Forwards ports of host port 6100 to device port 7100
+	-> Format for port forwarding:		adb forward tcp:local_port tcp:device_port
+	-> Format for port reversing:		adb reverse tcp:device_port tcp:local_port
+
+adb pull remote local		-	Copy a file or directory and its sub-directories from the device
+
+adb push local remote		-	Copy a file or directory and its sub-directories to the device
+
+adb [-d | -e | -s serial_number] command	-	Issue adb commands from a command line on your development machine or from a script
+
+adb [-d |-e | -s serial_number] shell shell_command	-	Use shell command to issue device commands through adb, or to start an interactive shell
+
+am command			-	Activity manager commands format
+
+adb shell am start -a android.intent.action.VIEW	-	Can send the Activity Manager (AM) command directly from adb without entering a remote shell
+
+pm command			-	Package manager commands format
+
+adb shell pm uninstall com.example.MyApp	-	Issue package manager command directly from adb without entering a remote shell
+
+adb shell pm list packages -s	-	List the system apps only on the Android device
+
+adb shell pm list packages -3	-	List all third-party apps installed on the Android device
+
+adb shell pm list packages -d	-	List all disabled apps on the Android device
+
+adb shell pm list packages -e	-	List all enabled apps on the Anrdoid device
+
+adb shell pm list packages -u	-	List all uninstalled apps on the Android device
+
+adb shell pm list packages <keywords>		-	List app packages with specific keyword filters
+
+adb shell pm list packages -f	-	List of apps along with their associated packages
+
+adb shell pm create-user username	-	Create a user username
+
+adb shell pm remove-user user 1		-	Remove a user form the device using the user_id '1'
+
+adb shell pm get-max-users	-	Print the maximum number of users supported on an Android device
+
+adb shell pm list features	-	Print all the supported features of the system
+
+adb shell pm list permissions	-	List all of the known permissions (optionally only those in 'group')
+	-> Parameters:	-g: Organize permissions by group
+			-f: Print all information
+			-s: Short summary of permissions
+			-d: List dangerous permissions only
+			-u: List the permissions seen by users only
+	-> Ex:		adb shell pm list permissions -d group
+
+adb shell settings list system	-	Get information of the system settings
+
+adb shell settings get system volume_system	-	Get system volume_system information
+
+adb shell settings get system notification_sound	-	Get system notification_sound
+
+adb shell settings list secure	-	Get list of secure settings
+
+adb shell settings get secure android_id	-	Get secure Android ID (Device ID)
+
+adb shell settings get secure bluetooth_address	-	Get the device Bluetooth Address
+
+adb shell settings list global	-	List global settings
+
+adb shell settings get global mobile_data	-	Get current mobile data status
+
+adb shell settings get global wifi_on	-	Get the current WiFi status
+
+dpm command			-	Device policy manager commands format
+
+adb shell dpm command		-	Issues device ploicy manager commands directly from adb without entering a remote shell
+
+screencap filename		-	Shell utility for taking a screenshot of the device display
+
+adb shell screencap /sdcard/screen.png		-	Run the screencap command from ADB
+	-> Ex:		$ adb shell
+			shell@ $ screencap /sdcard/screen.png
+			shell@ $ exit
+			$ adb pull /sdcard/screen.png
+
+screenrecord [options] filename		-	Shell utility for recording the display of the device
+
+adb shell screenrecord /sdcard/demo.mp4		-	Run the screenrecord command from ADB
+	-> Ex:		$ adb shell
+			shell@ $ screenrecord --verbose /sdcard/demo.mp4
+			(press Control + C to stop)
+			shell@ $ exit
+			$ adb pull /sdcard/demo.mp4
+adb shell screenrecord --size 1920x1080 /sdcard/screenrecord-01.mp4	-	Run the screenrecord command with a specific resolution
+adb shell screenrecord --time-limit 120 /sdcard/screenrecord-01.mp4	-	Run the screenrecord command with a specific duration
+adb shell screenrecord --bit-rate 6000000 /sdcard/screenrecord-01.mp4	-	Run the screenrecord command with a specific bitrate
+
+adb shell getprop		-	Displays the Android system properties informaiton
+	-> Ex:		getprop ro.build.version.sdk
+			getprop ro.chipname
+	- Note: The 'getprop' and 'setprop' commands can be used to view and set or change the configuration of the 'build.prop' file
+
+adb shell setprop		-	Change the value of an entry in the 'build.prop'
+	-> Ex:		getprop net.dns1 1.2.3.4
+			setprop net.dns1 1.3.4.5
+			getprop net.dns2 1.1.2.3
+			setprop net.dns2 1.2.3.4
+			setprop dalvik.vm.heapsize 60m		-	Change VMHeap size on Android device
+
+adb shell getprop ro.build.version.sdk		-	Get property for SDK version
+adb shell getprop ro.build.version.security_patch	-	Get property for security patch version
+adb shell getprop ro.board.platform		-	Get property board platform
+adb shell getprop ro.build.version.release	-	Get property release version
+adb shell getprop ro.vendor.product.model	-	Get property product model
+adb shell getprop ro.product.manufacturer	-	Get property product manufacturer
+adb shell getprop ro.serialno			-	Get property serial number
+adb shell getprop ro.oem_unlock_supported	-	Get property OEM unlock supported flag
+adb shell getprop ro.bootimage.build.fingerprint	-	Get property bootimage build fingerprint
+adb shell getprop ro.boot.wifimacaddr		-	Get property wifi MAC address
+
+adb -s < device ID > shell getprop		-	Returns the full configuration, running services, and information about the Android device
+	-> Note: The < device ID > comes from the alpha-numeric hash from the 'adb devices' command
+
+adb shell getprop | grep -e 'model' -e 'version.sdk' -e 'manufacturer' -e 'hardware' -e 'platform' -e 'r	-	One liner for outputs the system properties
+
+adb shell cmd package dump-profiles package	-	Produce a text form of the profile information
+	-> adb pull /data/misc/profman/package.txt	-	Retrieve the file produced
+
+adb shell cmd testharness enable	-	Reset a test device, using the 'testharness' adb shell command
+
+sqlite3 			-	Starts the sqlite command-line program for examining sqlite databases
+	-> Ex:		$ adb -s emulator-5554 shell
+			$ sqlite3 /data/data/com.example.app/databases/rssitems.db
+			SQLite version 3.3.12
+			Enter ".help" for instructions
+
+adb shell pm path 'com.pspdfkit.viewer'		-	Return APK file path on the Android device
+	-> One Liner:		adb pull `adb shell pm path 'com.pspdfkit.viewer' | cut -d ':' -f 2` viewer.apk
+
+adb tcpip 5555			-	Make the target device's adb daemon listen for TCP/IP connections on port 5555
+
+
+Activity Manager (AM) Commands:
+	start [options] intent		-	Start an Activity specified by intent
+	startservice [options] intent	-	Start the Service specified by intent
+	force-stop package		-	Force stop everything associated with package (the app's package name).
+	kill [options] package		-	Kill all processes associated with package (the app's package name). This command kills only processes that are safe to kill and that will not impact the user experience.
+	kill-all			-	Kill all background processes.
+	broadcast [options] intent	-	Issue a broadcast intent.
+	instrument [options] component	-	Start monitoring with an Instrumentation instance. Typically the target component is the form test_package/runner_class.
+	profile start process file	-	Start profiler on process, write results to file.
+	profile stop process		-	Stop profiler on process.
+	dumpheap [options] process file	-	Dump the heap of process, write to file.
+	set-debug-app [options] package	-	Set app package to debug.
+	clear-debug-app			-	Clear the package previous set for debugging with set-debug-app.
+	monitor [options]		-	Start monitoring for crashes or ANRs.
+	screen-compat {on | off} package	-	Control screen compatibility mode of package.
+	display-size [reset | widthxheight]	-	Override device display size. This command is helpful for testing your app across different screen sizes by mimicking a small screen resolution using a device with a large screen, and vice versa.
+		-> Ex:		am display-size 1280x800
+	display-density dpi			-	Override device display density. This command is helpful for testing your app across different screen densities on high-density screen environment using a low density screen, and vice versa.
+	to-uri intent			-	Print the given intent specification as a URI.
+	to-intent-uri intent		-	Print the given intent specification as an intent: URI.
+
+Package Manager (PM) Commands:
+	list packages [options] filter	-	Prints all packages, optionally only those whose package name contains the text in filter.
+	list permission-groups		-	Prints all known permission groups.
+	list permissions [options] group	-	Prints all known permissions, optionally only those in group.
+	list instrumentation [options]	-	List all test packages.
+	list features			-	Prints all features of the system.
+	list libraries			-	Prints all the libraries supported by the current device.
+	list users			-	Prints all users on the system.
+	path package			-	Print the path to the APK of the given package.
+	install [options] path		-	Installs a package (specified by path) to the system.
+	uninstall [options] package	-	Removes a package from the system.
+		-> -k: Keep the data and cache directories around after package removal.
+	clear package			-	Deletes all data associated with a package.
+	enable package_or_component	-	Enable the given package or component (written as "package/class").
+	disable package_or_component	-	Disable the given package or component (written as "package/class").
+	disable-user [options] package_or_component	-	Disables User 
+		-> --user user_id: The user to disable.
+	grant package_name permission	-	Grant a permission to an app. On devices running Android 6.0 (API level 23) and higher, the permission can be any permission declared in the app manifest. On devices running Android 5.1 (API level 22) and lower, must be an optional permission defined by the app.
+	revoke package_name permission	-	Revoke a permission from an app. On devices running Android 6.0 (API level 23) and higher, the permission can be any permission declared in the app manifest. On devices running Android 5.1 (API level 22) and lower, must be an optional permission defined by the app.
+	set-install-location location	-	Changes the default install location
+		-> 0: Auto: Let system decide the best location.
+		-> 1: Internal: install on internal device storage.
+		-> 2: External: on external media.
+	get-install-location		-	Returns the current install location.
+		-> 0 [auto]: Lets system decide the best location
+		-> 1 [internal]: Installs on internal device storage
+		-> 2 [external]: Installs on external media
+	set-permission-enforced permission [true | false]	-	Specifies whether the given permission should be enforced.
+	trim-caches desired_free_space	-	Trim cache files to reach the given free space.
+	create-user user_name		-	Create a new user with the given user_name, printing the new user identifier of the user.
+	remove-user user_id		-	Remove the user with the given user_id, deleting all data associated with that user
+	get-max-users			-	Prints the maximum number of users supported by the device.
+
+Device Policy Manager (DPM) Commands:
+	set-active-admin [options] component	-	Sets component as active admin.
+	set-profile-owner [options] component	-	Sets component as active admin and its package as profile owner for an existing user.
+	set-device-owner [options] component	-	Sets component as active admin and its package as device owner.
+	remove-active-admin [options] component	-	Disables an active admin. The app must declare android:testOnly in the manifest. This command also removes device and profile owners.
+	clear-freeze-period-record		-	Clears the device's record of previously-set freeze periods for system OTA updates. This is useful to avoid the device's scheduling restrictions when developing apps that manage freeze-periods.
+	force-network-logs			-	Forces the system to make any existing network logs ready for retrieval by a DPC. If there are connection or DNS logs available, the DPC receives the onNetworkLogsAvailable() callback.
+	force-security-logs			-	Forces the system to make any existing security logs available to the DPC. If there are logs available, the DPC receives the onSecurityLogsAvailable() callback.
+	
+
+----------------
+	COMMANDS
+----------------
+
+1       uname -a
+2       pm list packages	-	List all existing packages on the Android device
+3       logcat			-	Dumps out the system log information?
+4       dumpsys			-	Dumps out system information (TONS OF INFO)
+	-> Note: In order to use this tool don’t forget to add permission into your Android manifest automatically 'android.permission.DUMP'
+5       dumpsys battery		-	Dumps out battery information
+adb shell dumpsys input		-	Dumps out input logs (?)
+adb shell dumpsys display	-	Dumps out display information
+adb shell dumpsys batterystats	-	Dumps out battery stats
+adb shell dumpsys activity	-	Dumps out the activity information
+adb shell dumpsys cpuinfo	-	Dumps out the CPU usage by processes and applications
+adb shell dumpsys window displays	-	Dumps out very detailed information related to the displays
+adb shell wm size		-	Dumps out the display resolution
+
+adb shell wm density		-	Dumps out the pixel density of the Android device's display
+
+service call statusbar 1	-	Causes the status bar to drop on the running Android device
+service call statusbar 2 	-	Causes the status bar to pull back up on the running Android device
+
+input keyevent 26		-	Sending a keyevent to the running Android device 
+adb shell input keyevent 2	-	Turn Android device ON or OFF
+adb shell input keyevent 3	-	Press Home button
+adb shell input keyevent 4	-	Press Back button
+adb shell input keyevent 5	-	Press Call button
+adb shell input keyevent 6	-	End a Call
+adb shell input keyevent 26	-	Press Power Button to wake up screen
+adb shell input keyevent 27	-	Turn ON the camera
+adb shell input keyevent 64	-	Open wen browser
+adb shell input keyevent 66	-	Press the Enter / OK key
+adb shell input keyevent 67	-	Press Backspace button
+adb shell input keyevent 207	-	Open Contacts app
+adb shell input keyevent 220	-	Decrease display brightness
+adb shell input keyevent 221	-	Increase Display brightness
+adb shell input keyevent 277	-	Cut text
+adb shell input keyevent 278	-	Copy text
+adb shell input keyevent 279	-	Paste text
+adb shell input keyevent KEYCODE_SLEEP	-	Make the device sleep
+adb shell input keyevent KEYCODE_WAKEUP	-	Make device wakeup
+(adb shell) input keyevent KEYCODE_POWER	-	Toggle Power menu
+
+netstat				-	Display all the TCP Connections on the running Android device
+
+cat /proc/<proc ID>/comm	-	Display the chosen <proc ID> package name
+
+adb shell am start -a android.intent.action.SENDTO -d sms:+918052000222 --es sms_body "Test --ez exit_on_sent false	-	Send a text message using command line interface
+		-> Note: Above " is missing terminator (protection against web crawlers?)
+
+adb shell rm			-	Delete a file or folder (same as general linux rm command)
+
+input text XXXX			-	Input text into the device; can be ued for inputing 'XXXX' PIN / passcode
+
+sendevent			-	Allows for simulating actions / finger gestures on the device pattern lock
+	-> Ex:		sendevent 3 0
+			sendevent 3 1
+			sendevent 0 0 0 # (event separator)
+	-> Ex:		adb shell					EXAMPLE SIMPLIFIED VERSION OF EXISTING PATTERN INPUT VIA CLI (ADB)
+			input keyevent 2				
+			sendevent /dev/input/event3 3 57 14
+			sendevent /dev/input/event3 1 330 1
+			sendevent /dev/input/event3 3 53 x1
+			sendevent /dev/input/event3 3 54 y1
+			sendevent /dev/input/event3 3 58 57
+			sendevent /dev/input/event3 0 0 0
+			sendevent /dev/input/event3 3 53 x2
+			sendevent /dev/input/event3 3 54 y2
+			sendevent /dev/input/event3 3 58 57
+			sendevent /dev/input/event3 0 0 0
+			sendevent /dev/input/event3 3 53 x3
+			sendevent /dev/input/event3 3 54 y3
+			sendevent /dev/input/event3 3 58 57
+			sendevent /dev/input/event3 0 0 0
+			…
+			sendevent /dev/input/event3 3 53 xn
+			sendevent /dev/input/event3 3 54 yn
+			sendevent /dev/input/event3 3 58 57
+			sendevent /dev/input/event3 0 0 0
+			sendevent /dev/input/event3 3 57 4294967295
+			sendevent /dev/input/event3 1 330 0
+			sendevent /dev/input/event3 0 0 0
+
+Android Mobile Hacks:
+	- URL:		https://www.securitynewspaper.com/2019/07/29/android-mobile-hacks-with-android-debug-bridgeadb-part-i/
+	- URL:		https://www.securitynewspaper.com/2019/07/30/android-mobile-hacks-with-android-debug-bridgeadb-part-ii/
+	- URL:		https://www.quora.com/What-are-some-good-Android-debug-bridge-ADB-hacks
+
+General Hacks / Vulnerabilities to Attempt:
+	-> 	rm /data/system/gesture.key		-	Delete the file that verifies the mobile device unlock pattern
+		- Note: This may / may not work depending on how the OS runs / resolves the issue
+	-> 	adb devices				-	Remove all key configuratins present so that the phone can be unlocked by any combination
+		adb shell
+		cd data/system
+		su rm *.key
+	->	adb shell				-	Remove lock pattern information out of the settings database
+		cd /data/data/com.android.providers.settings/databases
+		sqlite3 settings.db
+		update system set value=0 where name='lock_pattern_autolock';
+		update system set value=0 where name='lockscreen.lockedoutpermanently'; .quit
+		restart phone
+
+Emulate a device within ADB:
+	-> emulator -avd Nexus_6_API_25 -port 5555	-	Emulate a Nexus 6 device
+
+Note: The following can be input into a phone dialer to check / interact / change settins on the Android device
+*#06#				-	Typed into the phone's dialer, this will pop up the device's IMEI number on the screen
+*#*#4636#*#* 			- 	Display device information
+*#*#7780#*#* 			- 	Perform a Factory Reset
+*2767*3855# 			- 	Wipe phone & re-install firmware
+*#0228# 			-	Check battery status
+*#0*# 				-	Hardware test mode
+*43# 				- 	Enable call waiting
+*#67# 				-	Check call forwarding status
+*#21# 				- 	Check call forwarding status
+*#62# 				- 	Check call forwarding status when not reachable
+##002# 				- 	Erase all call forwarding
+*31# 				- 	Hide Caller ID
+*#004# 				-	Check call diversion status
+*#9090# 			-	Open diagnostic configuration screen
+*#0011# 			-	Service Mode
+*#2222# 			-	Check Hardware version
+*#1234# 			-	Check software version (Samsung)
+*#12580*369# 			-	Check Software and hardware version
+*#0283# 			-	Check Audio loopback control
+*#34971539# 			-	Check Camera firmware
+*#9900# 			-	Launch System Dump mode
+**04* 				-	Change Android device PIN
+
+
+----------------
+        NOTES:
+----------------
+
+bluetooth_input_device_priority_C8:85:50:E7:6E:54=-1
+        - Looks like one can set a serides of Bluetooth device priorities
+bluetooth_headset_priority_C0:E8:62:27:D4:29=-1
+bluetooth_a2dp_sink_priority_84:4F:03:06:1E:46=1000
+cert_pin_content_url=ert_pin_content_url=
+cert_pin_metadata_url=
+
+
+----------------
+	TOOLS
+----------------
+
+Using ADB in Windows:
+	- URL:		https://www.howtogeek.com/125769/how-to-install-and-use-abd-the-android-debug-bridge-utility/
+Android Debug Bridege Documentation:
+	- URL:		https://developer.android.com/studio/command-line/adb
+
+Good ADB Tool:
+	- URL:		https://kalilinuxtutorials.com/adb-toolkit/
+ADBSploit:
+	- URL:		https://secnhack.in/adbsploit-managing-and-exploit-android-devices/
+Command Line ADB:
+	- URL:		https://developer.android.com/studio/command-line/adb
+Good ADB Hacks:
+	- URL:		https://www.quora.com/What-are-some-good-Android-debug-bridge-ADB-hacks
+	- Note: Has information for Hacking And Bypassing Android Password/Pattern/Face/PI
+ADB Cheat Sheets:
+	- URL:		https://technastic.com/adb-shell-commands-list/#ADB_Shell_Commands_List_Cheat_Sheet
+Pin / Passcode Cracking:
+	- URL:		https://stackoverflow.com/questions/23529460/is-there-a-way-to-unlock-android-phone-via-adb-if-i-know-the-pattern/
+Android 'Secret' Code:
+	- URL:		https://technastic.com/android-secret-codes-ussd-codes/
+	- PDF URL:	https://drive.google.com/file/d/14bvDEFTIl3rYUhEo0thd1geHZZjb4-SA/view
+
+Vysor Remote Control Tool:
+	- URL:		https://www.vysor.io/
+Monkey Remote Control Tool (no app, just ADB; can be slow refresh ~1fps):
+	- URL:		https://github.com/ns130291/MonkeyRemote/releases
+scrcpy Remote Control Tool (requires small app on the device)
+	- URL:		https://github.com/Genymobile/scrcpy

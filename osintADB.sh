@@ -94,6 +94,10 @@ function osint_explore_adb_target {
 	# Print System Permissions
 	echo -e "\tList of the Known Permissions:"
 	adb -s $adb_target_id shell pm list permissions
+	echo -e "--------------------------------------------------------------------------------"
+	echo -e "\tInternal Device Testing"
+	## TODO: Add in commands to attempt screen control, take screenshots, and then exfiltrate
+	# Use screenrecord, screencap, then 'adb pull' the file; default location: /sdcard/<filename>
 	# End of the Search Output
 	echo -e "================================================================================"
 }
