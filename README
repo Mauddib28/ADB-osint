@@ -21,9 +21,47 @@ adb logcat 			— 	View your Android device’s log. Can be useful for debugging
 
 adb logcat -b threadtime	-	View the Android device's running logs?
 
+adb logcat [<option>] ... [<filter-spec>] ...	-	Command format usage for the logcat
+	-> Android log can be divided into the following levels:
+		- 'V' Verbose (Most output)	[ Lowest rank in list ]
+		- 'D' Debug
+		- 'I' Info
+		- 'W' Warning
+		- 'E' Error
+		- 'F' Fatal
+		- 'S' Silent (no output)	[ Highest rank in list ]
+	-> Ex:		adb logcat "*:W"
+		- Will produce Warning, Error, Fatal, and Silent log output; Note: The tag '*' must be surrounded with double quotes, otherwise an error will be thrown
+
+adb logcat ActivityManager:I MyApp:D *:S	-	Gives outputs of the 'ActivityManager' above the level of Info logs, Debug log output and abvoe for the 'MyApp' tag, and for other tags Silent log level
+
+adb logcat -v <format>		-	Specify the log output format
+	-> 'breif':		This writes out the default format of 	[ <priority>/<tag>(<pid>): <message> ]
+	-> 'process':		This writes out the format of 		[ <priority>(<pid>) <message> ]
+	-> 'tag':		This writes out the format of		[ <priority>/<tag>: <message> ]
+	-> 'raw':		This writes out the format of		[ <message> ]
+	-> 'time':		This writes out the format of		[ <datetime> <priority>/<tag>(<pid>): <mesage> ]
+	-> 'threadtime':	This writes out the format of		[ <datetime> <pid> <tid> <priority> <tag>: <message> ]
+	-> 'long':		This writes out the format of		[ <datetime> <pid>:<id> <priority>/<tag> <message> ]
+	-> Ex:		adb shell logcat -v long ActiviyManager:I *:S
+
+adb logcat -c			-	Clear log
+
+adb shell dmesg			-	Kernel log
+
 adb shell 			— 	Gives you an interactive Linux command-line shell on your device.
 
 adb shell command 		— 	Runs the specified shell command on your device.
+
+adb shell -e escape_char [-n] [-T] [-t] [-x] [command]		-	Issues a shell command in the target device and then exist the remote shell; use any combination of the following options:
+	-> '-e' specifies an escape character or the value 'none' if one does not want to use an escape character
+		- Note: If one does not privde a value, then the default escape character (a dash '-') is used
+	-> 'n' specifies not to read from 'stdin'
+	-> '-T' is used to disable pseudo-terminal utility (PTY) allocation
+	-> '-t' is used to force PTY allocation
+	-> '-x' is used to disbale remote exit codes and 'stdout/stderr' separation
+
+adb emu command			-	Run an emulator console command
 
 adb forward tcp:6100 tcp:7100	-	Forwards ports of host port 6100 to device port 7100
 	-> Format for port forwarding:		adb forward tcp:local_port tcp:device_port
@@ -90,6 +128,10 @@ adb usb				-	Restart the adb server listening on USB
 
 adb tcpip port-number		-	Restart the adb server listening on TCP at the specified port
 
+adb reconnect			-	Force a reconect from the host
+
+adb reconnect device		-	Force a reconnect from the device to force a reconnect
+
 am command			-	Activity manager commands format
 
 adb shell am start -a android.intent.action.VIEW	-	Can send the Activity Manager (AM) command directly from adb without entering a remote shell
@@ -145,6 +187,10 @@ adb shell settings list global	-	List global settings
 adb shell settings get global mobile_data	-	Get current mobile data status
 
 adb shell settings get global wifi_on	-	Get the current WiFi status
+
+adb shell cat /sys/class/net/wlan0/address	-	Mac Address
+
+adb shell cat /system/build.prop		-	Retrieve more hardware and system properties
 
 dpm command			-	Device policy manager commands format
 
@@ -214,6 +260,7 @@ adb shell pm path 'com.pspdfkit.viewer'		-	Return APK file path on the Android d
 
 adb tcpip 5555			-	Make the target device's adb daemon listen for TCP/IP connections on port 5555
 
+adb shell netcfg		-	Print out device network information
 
 Activity Manager (AM) Commands:
 	start [options] intent		-	Start an Activity specified by intent
@@ -235,6 +282,10 @@ Activity Manager (AM) Commands:
 	display-density dpi			-	Override device display density. This command is helpful for testing your app across different screen densities on high-density screen environment using a low density screen, and vice versa.
 	to-uri intent			-	Print the given intent specification as a URI.
 	to-intent-uri intent		-	Print the given intent specification as an intent: URI.
+	send-trim-memory <pid> <level>	-	Allows for the setting of proccess <pid> to set level of <level>
+		-> Ex:		adb shell am send-trim-memory 12345 RUNNING_LOW
+			- Means send command to process 12345, notify it to set level to RUNNING
+		- Process ID levels:	HIDDEN, RUNNING_MODERATE, BACKGROUND, RUNNING_LOW, MODERATE, RUNNING_CRITICAL, COMPLETE
 
 Package Manager (PM) Commands:
 	list packages [options] filter	-	Prints all packages, optionally only those whose package name contains the text in filter.
@@ -248,7 +299,7 @@ Package Manager (PM) Commands:
 	install [options] path		-	Installs a package (specified by path) to the system.
 	uninstall [options] package	-	Removes a package from the system.
 		-> -k: Keep the data and cache directories around after package removal.
-	clear package			-	Deletes all data associated with a package.
+	clear package			-	Deletes all data associated with a package (e.g. Clears app cache data)
 	enable package_or_component	-	Enable the given package or component (written as "package/class").
 	disable package_or_component	-	Disable the given package or component (written as "package/class").
 	disable-user [options] package_or_component	-	Disables User 
@@ -277,8 +328,6 @@ Device Policy Manager (DPM) Commands:
 	clear-freeze-period-record		-	Clears the device's record of previously-set freeze periods for system OTA updates. This is useful to avoid the device's scheduling restrictions when developing apps that manage freeze-periods.
 	force-network-logs			-	Forces the system to make any existing network logs ready for retrieval by a DPC. If there are connection or DNS logs available, the DPC receives the onNetworkLogsAvailable() callback.
 	force-security-logs			-	Forces the system to make any existing security logs available to the DPC. If there are logs available, the DPC receives the onSecurityLogsAvailable() callback.
-	
-
 ----------------
 	COMMANDS
 ----------------
@@ -295,9 +344,21 @@ adb shell dumpsys batterystats	-	Dumps out battery stats
 adb shell dumpsys activity	-	Dumps out the activity information
 adb shell dumpsys cpuinfo	-	Dumps out the CPU usage by processes and applications
 adb shell dumpsys window displays	-	Dumps out very detailed information related to the displays
+adb shell dumpsys iphonesubinfo		-	Dumps out the IMEI information for Android 4.4 and below
+adb shell (su) service call iphonesubinfo 1	-	Dumps out the IMEI for Android 5.0 and above; Note: Requires root access (i.e. 'su')
+
 adb shell wm size		-	Dumps out the display resolution
+adb shell wm size reset		-	Reset to the original display resolution
+adb shell wm size 480x1024	-	Set the display resolution to 480x1024
 
 adb shell wm density		-	Dumps out the pixel density of the Android device's display
+adb shell wm density reset	-	Reset the original screen density
+adb shell wm density 160	-	Set the screen density to 160 dpi
+
+adb shell wm overscan 0,0,0,200		-	Set the part of the screen that should be left "clean" (e.g. where the margin pixels for the screen are)
+	-> The four parameters represent left, top, right, bottom margin pixels to the edge
+	- Ex: The above means to leave the 200px in screen bottom "clean"
+adb shell wm overscan reset	-	Reset to the original overscan
 
 service call statusbar 1	-	Causes the status bar to drop on the running Android device
 service call statusbar 2 	-	Causes the status bar to pull back up on the running Android device
@@ -305,23 +366,48 @@ service call statusbar 2 	-	Causes the status bar to pull back up on the running
 input keyevent 26		-	Sending a keyevent to the running Android device 
 adb shell input keyevent 2	-	Turn Android device ON or OFF
 adb shell input keyevent 3	-	Press Home button
-adb shell input keyevent 4	-	Press Back button
-adb shell input keyevent 5	-	Press Call button
+adb shell input keyevent 4	-	Press Back button 
+adb shell input keyevent 5	-	Press Call button (Open Dialing Application)
 adb shell input keyevent 6	-	End a Call
-adb shell input keyevent 26	-	Press Power Button to wake up screen
-adb shell input keyevent 27	-	Turn ON the camera
-adb shell input keyevent 64	-	Open wen browser
+adb shell input keyevent 24	-	Increase Volume
+adb shell input keyevent 25	-	Decrease Volume
+adb shell input keyevent 26	-	Press Power Button to wake up screen 
+adb shell input keyevent 27	-	Turn ON the camera (Taking Pictures in the Camera Application; Need In?)
+adb shell input keyevent 64	-	Open web browser
 adb shell input keyevent 66	-	Press the Enter / OK key
 adb shell input keyevent 67	-	Press Backspace button
+adb shell input keyevent 82	-	Menu Button
+adb shell input keyevent 85	-	Play / Pause Button
+adb shell input keyevent 86	-	Stop Playing
+adb shell input keyevent 87	-	Play Next
+adb shell input keyevent 88	-	Play on Again (? one? a?)
+adb shell input keyevent 122	-	Move the cursor to the beginning or top of the list
+adb shell input keyevent 123	-	Move the cursor to the end of the line or bottom of the list
+adb shell input keyevent 126	-	Resume Playing
+adb shell input keyevent 127	-	Pause / Play
+adb shell input keyevent 164	-	Mute
+adb shell input keyevent 176	-	Open the System Setup
+adb shell input keyevent 187	-	Switching Applications
 adb shell input keyevent 207	-	Open Contacts app
+adb shell input keyevent 208	-	Open Calendar
+adb shell input keyevent 209	-	Open Music
+adb shell input keyevent 210	-	Open Calculator
 adb shell input keyevent 220	-	Decrease display brightness
 adb shell input keyevent 221	-	Increase Display brightness
+adb shell input keyevent 223	-	System Sleep
+adb shell input keyevent 224	-	Light up the Screen
+adb shell input keyevent 231	-	Open the Voice Assistant
+adb shell input keyevent 276	-	If not wakelock allow the system to sleep
 adb shell input keyevent 277	-	Cut text
 adb shell input keyevent 278	-	Copy text
 adb shell input keyevent 279	-	Paste text
 adb shell input keyevent KEYCODE_SLEEP	-	Make the device sleep
 adb shell input keyevent KEYCODE_WAKEUP	-	Make device wakeup
 (adb shell) input keyevent KEYCODE_POWER	-	Toggle Power menu
+
+adb shell input swipe		-	If password lock screen is unlocked by sliding gesture, then one can use this command
+	-> Ex:		adb shell input swipe 300 1000 300 500
+		- Note: '300100300' parameters represent '500' starting x coordinate of the start point y coordinate of the end point x coordinated y coordinate of the end point (e.g. a swiping motion for a swipe bar)
 
 netstat				-	Display all the TCP Connections on the running Android device
 
@@ -332,7 +418,7 @@ adb shell am start -a android.intent.action.SENDTO -d sms:+918052000222 --es sms
 
 adb shell rm			-	Delete a file or folder (same as general linux rm command)
 
-input text XXXX			-	Input text into the device; can be ued for inputing 'XXXX' PIN / passcode
+input text XXXX			-	Input text into the device; can be ued for inputing 'XXXX' PIN / passcode or text into a text box
 
 sendevent			-	Allows for simulating actions / finger gestures on the device pattern lock
 	-> Ex:		sendevent 3 0
@@ -399,6 +485,20 @@ adb reverse --list		-	List all reverse socket connections from the device
 adb disable-verity		\__
 adb enable-verity		/	Disbale / Enable the 'dm-verity' checking on 'userdebug' builds
 	-> The 'dm-verity' option ensures that when a user boots a device that it is in the same state that is was in when it was last used
+adb shell settings put global adn_enabled 0		-	Turn off the Android debug; Note: Will require enabling thorugh "Developer options" settings menu
+
+adb shell settings put global hidden_api_policy_pre_p_apps 1	\___
+adb shell settings put global hidden_api_policy_p_apps 1	/	Allow access to non SDK API
+	-> Potential values to place in the command tail:
+		- 0:	Disable detect for non SDK API call; no call log in logcat, make strict mode API, detectNonSdkApiUsage() invalid (NOT RECOMMENDED)
+		- 1:	Just warning; allow access to all non SDK API, but retain warnings in logcat; one can continue to use strict mode API
+		- 2:	It is forbidden to invoke interfaces in dark grey lists and black lists
+		- 3:	It is forbidden to invoke the interface in the black list, but it is allow to call in therface in the dark grey list
+
+adb shell settings put global policy_control <key-values>	-	(Related to Cynogen mod)
+
+adb shell settings delete global hidden_api_policy_pre_p_apps	\___
+adb shell settings delete global hidden_api_policy_p_apps	/	Forbid access to non SDK API
 
 Note: The following can be input into a phone dialer to check / interact / change settins on the Android device
 *#06#				-	Typed into the phone's dialer, this will pop up the device's IMEI number on the screen
@@ -462,6 +562,12 @@ Pin / Passcode Cracking:
 Android 'Secret' Code:
 	- URL:		https://technastic.com/android-secret-codes-ussd-codes/
 	- PDF URL:	https://drive.google.com/file/d/14bvDEFTIl3rYUhEo0thd1geHZZjb4-SA/view
+ADB Shell Commands:
+	- URL:		http://adbcommand.com/adbshell
+ADB Fastboot Usage:
+	- URL:		http://adbcommand.com/fastboot
+Awesome ADB Documentation:
+	- URL:		http://adbcommand.com/awesome-adb
 
 Vysor Remote Control Tool:
 	- URL:		https://www.vysor.io/
