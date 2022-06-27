@@ -132,6 +132,12 @@ adb reconnect			-	Force a reconect from the host
 
 adb reconnect device		-	Force a reconnect from the device to force a reconnect
 
+adb shell service list		-	List system services running on the Android device
+
+adb shell dumpsys activity services		-	List ALL services running on the Android device
+
+adb shell dumpsys activity services myservice		-	List all services containing the "myservices" in their name
+
 am command			-	Activity manager commands format
 
 adb shell am start -a android.intent.action.VIEW	-	Can send the Activity Manager (AM) command directly from adb without entering a remote shell

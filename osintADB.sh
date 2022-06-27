@@ -36,7 +36,7 @@ function intro_information {
 	echo -e "	Android Debugging Bridge	-	OSINT Searching Tool				"
 	echo -e "	------------------------------------------------------------				"
 	echo -e "												"
-	echo -e " Usage:	./osintADB.sh	< device Id >							"
+	echo -e " Usage:	./osintADB.sh	< osint storage directoy > < device Id >							"
 	echo -e "	-> Note: If no Device ID is provided, then the script will attempt to locate		"
 	echo -e "			the appropriate device candidates					"
 	echo -e " The purpose of this tool is to gather information on Android devices, connected to via adb	"
@@ -100,10 +100,10 @@ function osint_explore_adb_target {
 	echo -e "[*] Attempting Screen Capture and Recordings of Android Device"
 	echo -e "\tScreen Capture being Attempted...."
 	adb -s $adb_target_id shell screencap /sdcard/screen.png
-	adb -s $adb_target_id shell pull /sdcard/screen.png
+	adb -s $adb_target_id shell pull /sdcard/screen.png $osint_directory_location
 	echo -e "\tAttempting Screen Recording...."
 	adb -s $adb_target_id shell screenrecord /sdcard/demo.mp4
-	adb -s $adb_target_id shell pull /sdcard/demo.mp4
+	adb -s $adb_target_id shell pull /sdcard/demo.mp4 $osint_directory_location
 	adb -s $adb_target_id shell getprop net.dns2
 	echo -e "[*] Gathering Activity Manager (AM) Information"
 	#adb -s $adb_target_id shell am 
@@ -137,7 +137,10 @@ if [[ $# -eq 0 ]]; then
 	intro_information
 	#exit 1
 elif [[ $# -eq 1 ]]; then
-	echo -e "Searching for Device ID $1"
+	echo -e "Searching for OSINT Storage Directory $1"
+elif [[ $# -eq 2 ]]; then
+	echo -e "Searching for OSINT Storage Directory $1"
+	echo -e "Searching for Device ID $2"
 else
 	echo -e "Received too many arguments....."
 	exit 2
@@ -151,6 +154,23 @@ else
 	echo -e "[-] ADB server is not currently running... Starting up server"
 	adb start-server
 	echo -e "[+] ADB server has been started"
+fi
+
+## TODO: Check if the provided storage directory exists
+osint_directory_location=$1
+# Check that the first variable was not empty
+if [[ ! -z "$osint_directory_location" ]]; then 
+	echo -e "[+] User Provided an OSINT Storage Directory"
+else
+	echo -e "[-] User has not provided an OSINT Storage Directory"
+	exit 3
+fi
+# Check that the OSINT Storage Directory actually exists or not
+if [[ ! -d $osint_directory_location ]]; then
+	echo -e "[-] Provided OSINT Storage Directory does NOT exist..."
+	exit 4
+else
+	echo -e "[+] Confirmed existence of OSINT Storage Directoy [ $osint_directory_location ]"
 fi
 
 ## Check for any existing devices
