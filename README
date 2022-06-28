@@ -583,3 +583,5 @@ Monkey Remote Control Tool (no app, just ADB; can be slow refresh ~1fps):
 	- URL:		https://github.com/ns130291/MonkeyRemote/releases
 scrcpy Remote Control Tool (requires small app on the device)
 	- URL:		https://github.com/Genymobile/scrcpy
+ADB Shell Screenrecord Command Examples:
+	- URL:		https://appscms.com/adb-commands/adb-shell-screenrecord

