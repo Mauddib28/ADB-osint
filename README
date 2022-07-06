@@ -142,6 +142,22 @@ am command			-	Activity manager commands format
 
 adb shell am start -a android.intent.action.VIEW	-	Can send the Activity Manager (AM) command directly from adb without entering a remote shell
 
+adb shell am start -a android.intent.action.CALL -d tel:+9111111111
+        -> Make phone call from ADB
+        
+adb shell am start -a android.intent.action.SENDTO -d sms:+9111111111 --es sms_body "Msg Text"
+        -> Send a text via ADB
+        - Note: Sets up text, but does not send it (?)
+        
+adb shell am start -W -c android.intent.category.HOME -a android.intent.action.MAIN
+        -> Return to the home screen no matter where one is
+
+adb shell am start -n com.spotify.music/.MainActivity
+        -> Remotely start a package via ADB shell
+        
+adb shell am start -a android.intent.actoin.VIEW -d /sdcard/record.wav -y audio/wav
+        -> Play audio on the device
+
 pm command			-	Package manager commands format
 
 adb shell pm uninstall com.example.MyApp	-	Issue package manager command directly from adb without entering a remote shell
@@ -353,7 +369,16 @@ adb shell dumpsys activity	-	Dumps out the activity information
 adb shell dumpsys cpuinfo	-	Dumps out the CPU usage by processes and applications
 adb shell dumpsys window displays	-	Dumps out very detailed information related to the displays
 adb shell dumpsys iphonesubinfo		-	Dumps out the IMEI information for Android 4.4 and below
+
+adb shell "dumpsys package | grep -i 'com.spotify.music' | grep 'Activity' "
+        -> Returns the ativity for starting the package?
+         Note: Looking for the .MainActivity value
+
 adb shell (su) service call iphonesubinfo 1	-	Dumps out the IMEI for Android 5.0 and above; Note: Requires root access (i.e. 'su')
+
+adb shell service call audio 10 i32 3 i32 0
+        -> Set volume to 0 (??)
+        - Note: Unsure exactly how the above command gets built
 
 adb shell wm size		-	Dumps out the display resolution
 adb shell wm size reset		-	Reset to the original display resolution
@@ -379,7 +404,7 @@ adb shell input keyevent 5	-	Press Call button (Open Dialing Application)
 adb shell input keyevent 6	-	End a Call
 adb shell input keyevent 24	-	Increase Volume
 adb shell input keyevent 25	-	Decrease Volume
-adb shell input keyevent 26	-	Press Power Button to wake up screen 
+adb shell input keyevent 26	-	Press Power Button to wake up/turn off screen 
 adb shell input keyevent 27	-	Turn ON the camera (Taking Pictures in the Camera Application; Need In?)
 adb shell input keyevent 64	-	Open web browser
 adb shell input keyevent 66	-	Press the Enter / OK key
@@ -428,6 +453,34 @@ adb shell rm			-	Delete a file or folder (same as general linux rm command)
 
 input text XXXX			-	Input text into the device; can be ued for inputing 'XXXX' PIN / passcode or text into a text box
 
+adb shell input text
+        -> Send text to the Android device
+                - Note: This input can go to a series of sinks
+        - List of input varieties:
+                - Insert Text:          
+                        - Ex:                   adb shell input text "insert%syour%stext%shere"
+                                - '%s' translates to < space >
+                        - Ex:                   adb shell input text "Wow it so cool feature"
+                                -> Print text using ADB
+                        - Ex:                   adb shell input keyboard text "rr"
+                                - Use the above to send a reload call to a React-Native app running on android device
+                - Event Codes:
+                        - Ex:                   adb shell input keyevent 82
+                        - '82' is the Menu Button
+                - Tap X,Y Position:     
+                        - Ex:                   adb shell input tap 500 1450
+                        - Note: One can get help by enabling Settings > Developer Options > Check option 'Pointer SLocation'
+                - Swipe X1 Y1 X2 Y2 [duration(ms)]:
+                        - Ex:                   adb shell input swipe 100 500 100 1450 11
+                        - Ex:                   adb shell input touchscreen swipe start_X start_Y end_x end_y time_To_take_performing_action
+                        - Ex:                   adb shell input touchscreen swipe
+                                - 500 500 500 500 2000
+                                        -> Two second long press
+                - LongPress X Y:
+                        - Ex:                   adb shell input swipe 100 500 100 500 250
+        - Can use the 'input text' help menu to get a list of sources for the command
+                - Examples: keyboard, mouse, joystick, touchnavigation, touchpag, trackball, dpad, stylus, gamepad, touchscreen
+
 sendevent			-	Allows for simulating actions / finger gestures on the device pattern lock
 	-> Ex:		sendevent 3 0
 			sendevent 3 1
@@ -456,6 +509,7 @@ sendevent			-	Allows for simulating actions / finger gestures on the device patt
 			sendevent /dev/input/event3 3 57 4294967295
 			sendevent /dev/input/event3 1 330 0
 			sendevent /dev/input/event3 0 0 0
+"adb sendevent" is actually c code (part of toolbox utility ) that sends the input code directly into the /dev/input.... of Linux input subsystem.
 
 Android Mobile Hacks:
 	- URL:		https://www.securitynewspaper.com/2019/07/29/android-mobile-hacks-with-android-debug-bridgeadb-part-i/
@@ -544,10 +598,42 @@ bluetooth_a2dp_sink_priority_84:4F:03:06:1E:46=1000
 cert_pin_content_url=ert_pin_content_url=
 cert_pin_metadata_url=
 
+----------------------------------------------------------
+                DIRECTORIES + LOCATIONS WORTH SEARCHING
+----------------------------------------------------------
 
-----------------
-	TOOLS
-----------------
+shared_prefs    -       Dump directory of temp storage for stuff
+        
+service call isms
+        -> NOTE: WIll need to call with correct parameters
+        
+/data/local/tmp
+        -> Good place to find information
+        - Almost always exists, even if there is no SD Card on the phone
+
+----------------------------------------------------------
+                USEFUL TOOLS AND REPOSITORIES
+----------------------------------------------------------
+
+genymobile/scrcpy
+        -> SCreen copy pckage
+        -> Built through brew
+        
+muri11as/Android-SMS
+        -> PAckage for extracting SMS packages(?)
+        
+PYthon ADB package (ppadb)
+
+easy-dumpsys
+        -> Github that translates output
+        service list | grep 'sms'
+                -> Get services
+        getprop | grep 'sdk'
+                -> Use to find SDK Version
+
+----------------------------------------------------------
+                KNOWLEDGE AND RESOURCES
+----------------------------------------------------------
 
 Using ADB in Windows:
 	- URL:		https://www.howtogeek.com/125769/how-to-install-and-use-abd-the-android-debug-bridge-utility/
@@ -585,3 +671,9 @@ scrcpy Remote Control Tool (requires small app on the device)
 	- URL:		https://github.com/Genymobile/scrcpy
 ADB Shell Screenrecord Command Examples:
 	- URL:		https://appscms.com/adb-commands/adb-shell-screenrecord
+
+Good Examples of ADB Command 'input':
+        - URL:  https://stackoverflow.com/questions/7789826/adb-shell-input-events?adlt=strict
+List of Event/Key Codes:
+        - URL:  https://developer.android.com/reference/android/view/KeyEvent.html
+
