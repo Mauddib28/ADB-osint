@@ -36,7 +36,7 @@ function intro_information {
 	echo -e "	Android Debugging Bridge	-	OSINT Searching Tool				"
 	echo -e "	------------------------------------------------------------				"
 	echo -e "												"
-	echo -e " Usage:	./osintADB.sh	< osint storage directoy > < device Id >							"
+	echo -e " Usage:	./osintADB.sh	< osint storage directoy > < device Id >			"
 	echo -e "	-> Note: If no Device ID is provided, then the script will attempt to locate		"
 	echo -e "			the appropriate device candidates					"
 	echo -e " The purpose of this tool is to gather information on Android devices, connected to via adb	"
@@ -167,6 +167,22 @@ function pull_remote_file_adb_shell {
 	adb -s $adb_target_id pull $abd_pull_target_and_location
 }
 
+# Function for Searching Known Directories on Android Device
+function search_for_interesting_files {
+	# Placing the function input into a local variable
+	local var function_input=($@)
+	# Extract the adb_target_id from the function input
+	local var adb_target_id=${function_input[0]}
+	# Extract the rest of the function inputs
+	local var adb_rest_of_inputs=${function_intput[@]:1}
+	# Start searching for the 'shared_prefs' file
+	echo -e "[*] Searching for the location of the 'shared_prefs' file"
+	send_remote_adb_shell_command $adb_target_id find / -iname 'shared_prefs' 2>/dev/null
+	# Search and return the contents of the '/data/local/tmp'; since this is a good location to find information, even if there is no SD Card
+	echo -e "[*] Searching for data in /data/local/tmp directory"
+	send_remote_adb_shell_command $adb_target_id ls -lah /data/local/tmp
+}
+
 # Function for testing shell interaction with the target android id
 function test_shell_interaction {
 	local var adb_target_id=$1
@@ -213,6 +229,11 @@ function test_shell_interaction {
 	pull_remote_file_adb_shell $adb_target_id $android_device_screen_recording_directory$work_profile_screen_recording_filename $adb_pull_location_directory
 	#adb -s $adb_target_id 
 }
+
+## Sub-list of Functions Purely for the Sake of Pranking / Annoying the User
+
+# Function for testing forced beahvior of the device
+#	- Examples include: going to the Home screen, forcing the screen to close, open different audio files, open specific packages
 
 ### Main Script
 

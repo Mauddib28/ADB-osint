@@ -138,6 +138,9 @@ adb shell dumpsys activity services		-	List ALL services running on the Android 
 
 adb shell dumpsys activity services myservice		-	List all services containing the "myservices" in their name
 
+service call isms
+        -> NOTE: WIll need to call with correct parameters
+
 am command			-	Activity manager commands format
 
 adb shell am start -a android.intent.action.VIEW	-	Can send the Activity Manager (AM) command directly from adb without entering a remote shell
@@ -603,9 +606,6 @@ cert_pin_metadata_url=
 ----------------------------------------------------------
 
 shared_prefs    -       Dump directory of temp storage for stuff
-        
-service call isms
-        -> NOTE: WIll need to call with correct parameters
         
 /data/local/tmp
         -> Good place to find information
